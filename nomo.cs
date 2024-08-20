@@ -13,11 +13,14 @@ class Program
             Console.WriteLine($"Processing file: {fileName}");
             Console.WriteLine($"Input bytes: {fileBytes.Length}");
 
-            // Decode the bytes from CP-1252 to a string
-            string decodedString = Encoding.GetEncoding("Windows-1252").GetString(fileBytes);
+            // Step 1: Decode the bytes as UTF-8 (even though they were intended to be Windows-1252)
+            string incorrectlyDecodedString = Encoding.UTF8.GetString(fileBytes);
 
-            // Re-encode the string to UTF-8 bytes
-            byte[] utf8Bytes = Encoding.UTF8.GetBytes(decodedString);
+            // Step 2: Re-decode this string as Windows-1252
+            byte[] windows1252Bytes = Encoding.GetEncoding("Windows-1252").GetBytes(incorrectlyDecodedString);
+
+            // Step 3: Re-encode the correctly interpreted data back to UTF-8
+            byte[] utf8Bytes = Encoding.UTF8.GetBytes(Encoding.GetEncoding("Windows-1252").GetString(windows1252Bytes));
             Console.WriteLine($"Output bytes: {utf8Bytes.Length}");
 
             // Construct the output file name
